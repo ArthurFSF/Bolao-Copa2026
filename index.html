@@ -16,44 +16,41 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .estado-salvo { @apply bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold; }
-        .estado-nao-salvo { @apply bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold; }
-        .estado-pendente { @apply bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold; }
-        .estado-processado { @apply bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold; }
-        .card-jogo { @apply bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition; }
-        .btn-primario { @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold; }
-        .btn-secundario { @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition; }
-        .loading { @apply opacity-50 cursor-not-allowed; }
+        .estado-salvo { background-color: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .estado-nao-salvo { background-color: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .estado-pendente { background-color: #fee2e2; color: #991b1b; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .estado-processado { background-color: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .card-jogo { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: box-shadow 0.2s; }
+        .card-jogo:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-primario { background-color: #2563eb; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; }
+        .btn-primario:hover { background-color: #1d4ed8; }
+        .btn-secundario { background-color: #e5e7eb; color: #374151; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: background-color 0.2s; }
+        .btn-secundario:hover { background-color: #d1d5db; }
+        .loading { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- ========================================
-         CONFIGURAÇÃO CRÍTICA: SUBSTITUA PELOS VALORES DE PRODUÇÃO
-         ======================================== -->
+
     <script>
-        // ⚠️ ALERTA: NÃO FAÇA COMMIT DE CREDENCIAIS REAIS NO GITHUB
-        // Substitua estes valores pelas chaves de produção antes de fazer deploy
         const CONFIG = {
             FIREBASE: {
-                apiKey: "AIzaSyDYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
-                authDomain: "copa-2026-bolao.firebaseapp.com",
-                projectId: "copa-2026-bolao",
-                storageBucket: "copa-2026-bolao.appspot.com",
-                messagingSenderId: "123456789000",
-                appId: "1:123456789000:web:abcdef1234567890"
+                apiKey: "AIzaSyAXItDoa0tFDrLyJFHv5XYFaF6wdZk-KbM",
+                authDomain: "bolaocopa2026-9f2c5.firebaseapp.com",
+                projectId: "bolaocopa2026-9f2c5",
+                storageBucket: "bolaocopa2026-9f2c5.firebasestorage.app",
+                messagingSenderId: "1013975984344",
+                appId: "1:1013975984344:web:cf16bdfd401c3c2c390fad"
             },
             EMAILJS: {
-                serviceId: "service_XXXXXXXX",
-                templateId: "template_XXXXXXXX",
-                userId: "YOUR_EMAILJS_PUBLIC_KEY"
+                serviceId: "service_XXXXXXXX", 
+                templateId: "template_XXXXXXXX", 
+                userId: "YOUR_EMAILJS_PUBLIC_KEY" 
             },
             TIMEZONE: "America/Sao_Paulo"
         };
     </script>
 
-    <!-- ======================================== ESTRUTURA HTML ======================================== -->
     <div id="app" class="min-h-screen bg-gray-50">
-        <!-- Navbar -->
         <nav class="sticky top-0 z-50 bg-white shadow">
             <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
                 <h1 class="text-2xl font-bold text-blue-600">⚽ Bolão Copa 2026</h1>
@@ -63,9 +60,7 @@
             </div>
         </nav>
 
-        <!-- Conteúdo Principal -->
         <div class="max-w-6xl mx-auto px-4 py-6">
-            <!-- Telas de Autenticação -->
             <div id="auth-screen" class="auth-screen">
                 <div class="max-w-md mx-auto mt-20 bg-white p-8 rounded-lg shadow-lg">
                     <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center">Login</h2>
@@ -89,9 +84,7 @@
                 </div>
             </div>
 
-            <!-- App Principal (após login) -->
             <div id="app-content" class="hidden">
-                <!-- Abas -->
                 <div class="flex gap-2 mb-6 border-b border-gray-300">
                     <button data-tab="jogos" class="tab-btn px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-semibold">
                         🎯 Jogos
@@ -104,7 +97,6 @@
                     </button>
                 </div>
 
-                <!-- Aba: Jogos -->
                 <div id="jogos" class="tab-content active">
                     <div class="mb-4 flex gap-2 flex-wrap">
                         <select id="fase-filter" class="border border-gray-300 rounded-lg px-3 py-2">
@@ -120,7 +112,6 @@
                     <button id="carregar-mais-jogos" class="btn-primario w-full mt-6 hidden">Carregar Mais Jogos</button>
                 </div>
 
-                <!-- Aba: Ranking -->
                 <div id="ranking" class="tab-content">
                     <div class="bg-white rounded-lg shadow">
                         <table class="w-full">
@@ -140,16 +131,13 @@
                     <button id="carregar-mais-ranking" class="btn-primario w-full mt-6 hidden">Carregar Mais</button>
                 </div>
 
-                <!-- Aba: Admin -->
                 <div id="admin" class="tab-content">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Painel de Resultados -->
                         <div class="bg-white p-6 rounded-lg shadow">
                             <h3 class="text-lg font-bold mb-4">Processar Resultados</h3>
                             <div id="admin-jogos-container" class="space-y-3"></div>
                         </div>
 
-                        <!-- Painel de E-mails -->
                         <div class="bg-white p-6 rounded-lg shadow">
                             <h3 class="text-lg font-bold mb-4">Enviar E-mails</h3>
                             <div class="space-y-3">
@@ -165,14 +153,12 @@
         </div>
     </div>
 
-    <!-- ======================================== FIREBASE & EMAILJS ======================================== -->
     <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
-    <!-- ======================================== JAVASCRIPT ======================================== -->
     <script>
-        // Funções auxiliares de data (sem dependência de dayjs complexo)
         function formatarData(timestamp) {
             if (!timestamp) return '-';
             const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -183,15 +169,14 @@
             return `${dia}/${mes} ${hora}:${min}`;
         }
 
-        // ========== FIREBASE ==========
+        // Inicialização Segura do Firebase
         const firebaseApp = firebase.initializeApp(CONFIG.FIREBASE);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Habilitar persistência offline com fallback
         async function initFirestore() {
             try {
-                await db.enableIndexedDbPersistence();
+                await db.enablePersistence();
                 console.log("✅ Persistência offline ativada");
             } catch (err) {
                 if (err.code === 'failed-precondition') {
@@ -203,25 +188,25 @@
         }
         initFirestore();
 
-        // ========== EMAILJS ==========
-        emailjs.init(CONFIG.EMAILJS.userId);
+        // Inicialização Isolada do EmailJS contra quebras de escopo
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init(CONFIG.EMAILJS.userId);
+        } else {
+            console.error("⚠️ SDK do EmailJS indisponível ou bloqueado por AdBlock.");
+        }
 
-        // ========== ESTADO GLOBAL ==========
         const state = {
             currentUser: null,
             currentTab: 'jogos',
             jogosPage: 0,
             rankingPage: 0,
             listeners: [],
-            jogosPaginados: [],
-            rankingPaginado: [],
             faseFilter: ''
         };
 
         const ITEMS_POR_PAGINA = 12;
         const RANKING_POR_PAGINA = 20;
 
-        // ========== FUNÇÕES UTILITÁRIAS ==========
         function estaTravaAtivaParaJogo(jogo) {
             if (!jogo.dataHora) return false;
             const jogoDate = jogo.dataHora.toDate ? jogo.dataHora.toDate() : new Date(jogo.dataHora);
@@ -237,7 +222,6 @@
             state.listeners = [];
         }
 
-        // ========== AUTENTICAÇÃO ==========
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const authScreen = document.getElementById('auth-screen');
@@ -261,7 +245,6 @@
             try {
                 if (isSignUp) {
                     await auth.createUserWithEmailAndPassword(email, password);
-                    // Criar documento do usuário
                     await db.collection('usuarios').doc(auth.currentUser.uid).set({
                         email: email,
                         pontos: 0,
@@ -315,7 +298,6 @@
             }
         });
 
-        // ========== VERIFICAR PERMISSÃO ADMIN ==========
         async function verificarSeEhAdmin() {
             try {
                 const doc = await db.collection('admins').doc(state.currentUser.uid).get();
@@ -326,14 +308,13 @@
                     adminTab.classList.add('hidden');
                 }
             } catch (err) {
-                console.log("Erro ao verificar admin:", err);
+                console.log("Erro verificação admin:", err);
             }
         }
 
-        // ========== NAVEGAÇÃO ENTRE ABAS ==========
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const tabName = e.target.dataset.tab;
+                const tabName = e.target.closest('button').dataset.tab;
                 state.currentTab = tabName;
                 
                 document.querySelectorAll('.tab-content').forEach(tab => {
@@ -362,14 +343,12 @@
             });
         });
 
-        // ========== FILTRO DE FASE ==========
         document.getElementById('fase-filter').addEventListener('change', (e) => {
             state.faseFilter = e.target.value;
             state.jogosPage = 0;
             carregarJogos();
         });
 
-        // ========== CARREGAR JOGOS ==========
         async function carregarJogos() {
             const container = document.getElementById('jogos-container');
             const btnCarregarMais = document.getElementById('carregar-mais-jogos');
@@ -379,19 +358,14 @@
 
             try {
                 let query = db.collection('jogos').orderBy('dataHora', 'asc');
-                
                 if (state.faseFilter) {
                     query = query.where('fase', '==', state.faseFilter);
                 }
-
                 query = query.limit(ITEMS_POR_PAGINA + 1);
 
                 const unsubscribe = query.onSnapshot(async (snapshot) => {
                     container.innerHTML = '';
-                    const jogos = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    })).slice(0, ITEMS_POR_PAGINA);
+                    const jogos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).slice(0, ITEMS_POR_PAGINA);
 
                     if (jogos.length === 0) {
                         container.innerHTML = '<p class="text-center text-gray-500">Nenhum jogo encontrado</p>';
@@ -400,9 +374,7 @@
                     }
 
                     for (const jogo of jogos) {
-                        const palpiteDoc = await db.collection('palpites')
-                            .doc(`${state.currentUser.uid}_${jogo.id}`).get();
-                        
+                        const palpiteDoc = await db.collection('palpites').doc(`${state.currentUser.uid}_${jogo.id}`).get();
                         jogo.palpiteSalvo = palpiteDoc.exists;
                         if (palpiteDoc.exists) {
                             const palpite = palpiteDoc.data();
@@ -410,14 +382,10 @@
                             jogo.golsVisitante = palpite.golsVisitante;
                             jogo.vencedorPenaltis = palpite.vencedorPenaltis;
                         }
-
-                        const card = criarCardJogo(jogo);
-                        container.appendChild(card);
+                        container.appendChild(criarCardJogo(jogo));
                     }
-
                     btnCarregarMais.classList.toggle('hidden', snapshot.docs.length <= ITEMS_POR_PAGINA);
                 });
-
                 state.listeners.push(unsubscribe);
             } catch (err) {
                 container.innerHTML = `<p class="text-center text-red-500">Erro: ${err.message}</p>`;
@@ -427,7 +395,6 @@
         function criarCardJogo(jogo) {
             const div = document.createElement('div');
             div.className = 'card-jogo';
-            
             const trava = estaTravaAtivaParaJogo(jogo);
             const estadoClass = jogo.palpiteSalvo ? 'estado-salvo' : 'estado-nao-salvo';
             const estadoText = jogo.palpiteSalvo ? '✓ Palpite Salvo' : '⚠ Não Salvo';
@@ -440,69 +407,58 @@
                     </div>
                     <span class="${estadoClass}">${estadoText}</span>
                 </div>
-
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     <div>
                         <label class="block text-xs text-gray-600 mb-1">Gols ${jogo.mandante || 'Mandante'}</label>
                         <input type="number" data-jogo-id="${jogo.id}" data-field="golsMandante" min="0" 
-                            value="${jogo.golsMandante || ''}" class="palpite-input w-full border border-gray-300 rounded px-2 py-1" 
-                            ${trava ? 'disabled' : ''}>
+                            value="${jogo.golsMandante !== undefined ? jogo.golsMandante : ''}" class="palpite-input w-full border border-gray-300 rounded px-2 py-1" ${trava ? 'disabled' : ''}>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-600 mb-1">Gols ${jogo.visitante || 'Visitante'}</label>
                         <input type="number" data-jogo-id="${jogo.id}" data-field="golsVisitante" min="0" 
-                            value="${jogo.golsVisitante || ''}" class="palpite-input w-full border border-gray-300 rounded px-2 py-1" 
-                            ${trava ? 'disabled' : ''}>
+                            value="${jogo.golsVisitante !== undefined ? jogo.golsVisitante : ''}" class="palpite-input w-full border border-gray-300 rounded px-2 py-1" ${trava ? 'disabled' : ''}>
                     </div>
                 </div>
-
                 ${jogo.fase !== 'Grupos' ? `
                     <div class="mb-4">
                         <label class="block text-xs text-gray-600 mb-2">Se ir a pênaltis:</label>
                         <select data-jogo-id="${jogo.id}" data-field="vencedorPenaltis" class="w-full border border-gray-300 rounded px-2 py-1" ${trava ? 'disabled' : ''}>
                             <option value="">Nenhum</option>
-                            <option value="${jogo.mandante}" ${jogo.vencedorPenaltis === jogo.mandante ? 'selected' : ''}>
-                                ${jogo.mandante} (pênaltis)
-                            </option>
-                            <option value="${jogo.visitante}" ${jogo.vencedorPenaltis === jogo.visitante ? 'selected' : ''}>
-                                ${jogo.visitante} (pênaltis)
-                            </option>
+                            <option value="${jogo.mandante}" ${jogo.vencedorPenaltis === jogo.mandante ? 'selected' : ''}>${jogo.mandante}</option>
+                            <option value="${jogo.visitante}" ${jogo.vencedorPenaltis === jogo.visitante ? 'selected' : ''}>${jogo.visitante}</option>
                         </select>
                     </div>
                 ` : ''}
-
-                <button data-jogo-id="${jogo.id}" class="btn-salvar-palpite btn-primario w-full" ${trava ? 'disabled opacity-50 cursor-not-allowed' : ''}>
+                <button data-id="${jogo.id}" class="btn-salvar-palpite btn-primario w-full" ${trava ? 'disabled opacity-50 cursor-not-allowed' : ''}>
                     ${trava ? '🔒 Jogo Trancado' : '💾 Salvar Palpite'}
                 </button>
-                ${trava ? '<p class="text-xs text-red-600 mt-2">Este jogo começa em menos de 2 horas</p>' : ''}
             `;
 
-            const btn = div.querySelector('.btn-salvar-palpite');
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await salvarPalpite(jogo.id);
+            div.querySelector('.btn-salvar-palpite').addEventListener('click', async () => {
+                await salvarPalpite(jogo.id, div);
             });
 
-            div.querySelectorAll('.palpite-input, [data-field="vencedorPenaltis"]').forEach(input => {
+            div.querySelectorAll('.palpite-input, select').forEach(input => {
                 input.addEventListener('change', () => {
-                    // Marcar como não salvo
-                    const estadoSpan = div.querySelector('[class*="estado-"]');
-                    estadoSpan.className = 'estado-nao-salvo';
-                    estadoSpan.textContent = '⚠ Não Salvo';
+                    const span = div.querySelector('[class*="estado-"]');
+                    span.className = 'estado-nao-salvo';
+                    span.textContent = '⚠ Não Salvo';
                 });
             });
-
             return div;
         }
 
-        async function salvarPalpite(jogoId) {
+        async function salvarPalpite(jogoId, cardElement) {
             if (!state.currentUser) return;
+            const golsMandante = parseInt(cardElement.querySelector('[data-field="golsMandante"]').value);
+            const golsVisitante = parseInt(cardElement.querySelector('[data-field="golsVisitante"]').value);
+            const selectPen = cardElement.querySelector('[data-field="vencedorPenaltis"]');
+            const vencedorPenaltis = selectPen ? selectPen.value : '';
 
-            const card = document.querySelector(`[data-jogo-id="${jogoId}"]`).closest('.card-jogo');
-            const golsMandante = parseInt(card.querySelector('[data-field="golsMandante"]').value) || 0;
-            const golsVisitante = parseInt(card.querySelector('[data-field="golsVisitante"]').value) || 0;
-            const vencedorPenaltisSelect = card.querySelector('[data-field="vencedorPenaltis"]');
-            const vencedorPenaltis = vencedorPenaltisSelect ? vencedorPenaltisSelect.value : '';
+            if (isNaN(golsMandante) || isNaN(golsVisitante)) {
+                alert('Preencha os gols para salvar.');
+                return;
+            }
 
             try {
                 await db.collection('palpites').doc(`${state.currentUser.uid}_${jogoId}`).set({
@@ -514,371 +470,60 @@
                     dataSalva: firebase.firestore.Timestamp.now()
                 }, { merge: true });
 
-                const estadoSpan = card.querySelector('[class*="estado-"]');
-                estadoSpan.className = 'estado-salvo';
-                estadoSpan.textContent = '✓ Palpite Salvo';
+                const span = cardElement.querySelector('[class*="estado-"]');
+                span.className = 'estado-salvo';
+                span.textContent = '✓ Palpite Salvo';
             } catch (err) {
                 alert('Erro ao salvar: ' + err.message);
             }
         }
 
-        // Botão Carregar Mais Jogos
-        document.getElementById('carregar-mais-jogos').addEventListener('click', () => {
-            state.jogosPage++;
-            carregarJogos();
-        });
-
-        // ========== CARREGAR RANKING ==========
         async function carregarRanking() {
             const tbody = document.getElementById('ranking-tbody');
-            const btnCarregarMais = document.getElementById('carregar-mais-ranking');
-
+            const btn = document.getElementById('carregar-mais-ranking');
             limparListeners();
-            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Carregando...</td></tr>';
 
             try {
-                let query = db.collection('usuarios')
-                    .orderBy('pontos', 'desc')
-                    .limit(RANKING_POR_PAGINA + 1);
-
+                const query = db.collection('usuarios').orderBy('pontos', 'desc').limit(RANKING_POR_PAGINA);
                 const unsubscribe = query.onSnapshot((snapshot) => {
                     tbody.innerHTML = '';
-                    const usuarios = snapshot.docs.slice(0, RANKING_POR_PAGINA).map((doc, idx) => ({
-                        posicao: idx + 1,
-                        ...doc.data()
-                    }));
-
-                    usuarios.forEach(usuario => {
+                    snapshot.docs.forEach((doc, idx) => {
+                        const user = doc.data();
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td class="px-4 py-3 font-bold text-lg">#${usuario.posicao}</td>
-                            <td class="px-4 py-3">${usuario.email}</td>
-                            <td class="px-4 py-3 text-center font-bold text-blue-600">${usuario.pontos || 0}</td>
-                            <td class="px-4 py-3 text-center">${usuario.acertos || 0}</td>
+                            <td class="px-4 py-3 font-bold">#${idx + 1}</td>
+                            <td class="px-4 py-3">${user.email}</td>
+                            <td class="px-4 py-3 text-center text-blue-600 font-bold">${user.pontos || 0}</td>
+                            <td class="px-4 py-3 text-center">${user.acertos || 0}</td>
                         `;
                         tbody.appendChild(tr);
                     });
-
-                    btnCarregarMais.classList.toggle('hidden', snapshot.docs.length <= RANKING_POR_PAGINA);
                 });
-
                 state.listeners.push(unsubscribe);
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">Erro: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4">Erro: ${err.message}</td></tr>`;
             }
         }
 
-        document.getElementById('carregar-mais-ranking').addEventListener('click', () => {
-            state.rankingPage++;
-            carregarRanking();
-        });
-
-        // ========== PAINEL ADMIN ==========
         async function carregarAdminPainel() {
             const container = document.getElementById('admin-jogos-container');
-            limparListeners();
-            container.innerHTML = '<p class="text-center text-gray-500">Carregando...</p>';
-
+            container.innerHTML = 'Carregando...';
             try {
-                const unsubscribe = db.collection('jogos')
-                    .orderBy('dataHora', 'asc')
-                    .limit(50)
-                    .onSnapshot((snapshot) => {
-                        container.innerHTML = '';
-                        snapshot.docs.forEach(doc => {
-                            const jogo = { id: doc.id, ...doc.data() };
-                            const div = document.createElement('div');
-                            div.className = 'border border-gray-300 p-3 rounded-lg mb-2';
-                            const estado = jogo.resultadoProcessado ? 'estado-processado' : 'estado-pendente';
-                            const estadoText = jogo.resultadoProcessado ? '✓ Processado' : '⏳ Pendente';
-
-                            div.innerHTML = `
-                                <div class="flex justify-between items-center mb-2">
-                                    <div>
-                                        <p class="font-semibold">${jogo.mandante} vs ${jogo.visitante}</p>
-                                        <p class="text-xs text-gray-500">${formatarData(jogo.dataHora)}</p>
-                                    </div>
-                                    <span class="${estado}">${estadoText}</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 mb-2">
-                                    <input type="number" placeholder="Gols ${jogo.mandante}" value="${jogo.golsReaisMandante || ''}" 
-                                        data-jogo-id="${jogo.id}" data-field="reais-mandante" class="border border-gray-300 rounded px-2 py-1 text-sm">
-                                    <input type="number" placeholder="Gols ${jogo.visitante}" value="${jogo.golsReaisVisitante || ''}" 
-                                        data-jogo-id="${jogo.id}" data-field="reais-visitante" class="border border-gray-300 rounded px-2 py-1 text-sm">
-                                </div>
-                                <button data-jogo-id="${jogo.id}" class="btn-processar-resultado btn-primario w-full text-sm py-1">
-                                    Processar Resultado
-                                </button>
-                            `;
-
-                            const btn = div.querySelector('.btn-processar-resultado');
-                            btn.addEventListener('click', async () => {
-                                await processarResultado(jogo.id);
-                            });
-
-                            container.appendChild(div);
-                        });
-                    });
-
-                state.listeners.push(unsubscribe);
-            } catch (err) {
-                container.innerHTML = `<p class="text-center text-red-500">Erro: ${err.message}</p>`;
-            }
-        }
-
-        async function processarResultado(jogoId) {
-            const jogo = await db.collection('jogos').doc(jogoId).get();
-            if (!jogo.exists) return;
-
-            const jogoData = jogo.data();
-            const adminDiv = document.querySelector(`[data-jogo-id="${jogoId}"]`).closest('div');
-            const golsMandante = parseInt(adminDiv.querySelector('[data-field="reais-mandante"]').value) || 0;
-            const golsVisitante = parseInt(adminDiv.querySelector('[data-field="reais-visitante"]').value) || 0;
-
-            try {
-                // Se já foi processado, estornar pontos antigos
-                if (jogoData.resultadoProcessado) {
-                    await db.collection('palpites')
-                        .where('jogoId', '==', jogoId)
-                        .get()
-                        .then(snapshot => {
-                            snapshot.forEach(doc => {
-                                db.collection('palpites').doc(doc.id).update({
-                                    pontos: 0,
-                                    acertos: 0
-                                });
-                            });
-                        });
-                }
-
-                // Calcular novos pontos para cada palpite
-                const palpites = await db.collection('palpites').where('jogoId', '==', jogoId).get();
-                palpites.forEach(async (palpiteDoc) => {
-                    const palpite = palpiteDoc.data();
-                    let pontos = 0;
-                    let acertos = 0;
-
-                    if (palpite.golsMandante === golsMandante && palpite.golsVisitante === golsVisitante) {
-                        pontos = 10;
-                        acertos = 1;
-                    } else if ((palpite.golsMandante > palpite.golsVisitante && golsMandante > golsVisitante) ||
-                               (palpite.golsMandante < palpite.golsVisitante && golsMandante < golsVisitante) ||
-                               (palpite.golsMandante === palpite.golsVisitante && golsMandante === golsVisitante)) {
-                        pontos = 5;
-                    }
-
-                    await db.collection('palpites').doc(palpiteDoc.id).update({
-                        pontos,
-                        acertos
-                    });
-
-                    // Atualizar usuário
-                    const user = await db.collection('usuarios').doc(palpite.userId).get();
-                    const userData = user.data() || {};
-                    await db.collection('usuarios').doc(palpite.userId).set({
-                        pontos: (userData.pontos || 0) + pontos,
-                        acertos: (userData.acertos || 0) + acertos,
-                        email: userData.email || palpite.userId
-                    }, { merge: true });
-                });
-
-                // Marcar jogo como processado
-                await db.collection('jogos').doc(jogoId).update({
-                    golsReaisMandante: golsMandante,
-                    golsReaisVisitante: golsVisitante,
-                    resultadoProcessado: true
-                });
-
-                alert('Resultado processado com sucesso!');
-            } catch (err) {
-                alert('Erro: ' + err.message);
-            }
-        }
-
-        // ========== ENVIAR E-MAILS ==========
-        document.getElementById('send-emails-btn').addEventListener('click', async () => {
-            const message = document.getElementById('email-message').value;
-            const status = document.getElementById('email-status');
-            const btn = document.getElementById('send-emails-btn');
-
-            if (!message.trim()) {
-                status.textContent = '❌ Escreva uma mensagem';
-                return;
-            }
-
-            try {
-                btn.disabled = true;
-                btn.classList.add('loading');
-                status.textContent = 'Obtendo lista de participantes...';
-
-                const usuarios = await db.collection('usuarios').get();
-                const emails = usuarios.docs.map(doc => doc.data().email);
-
-                status.textContent = `📧 Enviando ${emails.length} e-mails...`;
-
-                let enviados = 0;
-                for (const email of emails) {
-                    try {
-                        await emailjs.send(
-                            CONFIG.EMAILJS.serviceId,
-                            CONFIG.EMAILJS.templateId,
-                            {
-                                to_email: email,
-                                message: message
-                            }
-                        );
-                        enviados++;
-                        status.textContent = `📧 Enviados: ${enviados}/${emails.length}`;
-                    } catch (err) {
-                        console.log(`Erro ao enviar para ${email}:`, err);
-                    }
-                    // Throttling: aguardar 250ms entre envios
-                    await new Promise(resolve => setTimeout(resolve, 250));
-                }
-
-                status.textContent = `✅ ${enviados} e-mails enviados com sucesso!`;
-                document.getElementById('email-message').value = '';
-            } catch (err) {
-                status.textContent = '❌ Erro: ' + err.message;
-            } finally {
-                btn.disabled = false;
-                btn.classList.remove('loading');
-            }
-        });
-
-        // ========== SEEDING (Executar uma vez para popular 104 jogos) ==========
-        async function seedJogos() {
-            const jogos = [
-                // Fase de Grupos - Grupo A
-                { mandante: 'Uruguai', visitante: 'Panamá', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-20T15:00:00Z')) },
-                { mandante: 'Dinamarca', visitante: 'Marrocos', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-20T18:00:00Z')) },
-                { mandante: 'Uruguai', visitante: 'Dinamarca', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-25T18:00:00Z')) },
-                { mandante: 'Marrocos', visitante: 'Panamá', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-25T18:00:00Z')) },
-                { mandante: 'Panamá', visitante: 'Dinamarca', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-30T22:00:00Z')) },
-                { mandante: 'Marrocos', visitante: 'Uruguai', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-30T22:00:00Z')) },
-                // Fase de Grupos - Grupo B
-                { mandante: 'Portugal', visitante: 'Sérvia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-21T12:00:00Z')) },
-                { mandante: 'Gana', visitante: 'Bolívia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-21T18:00:00Z')) },
-                { mandante: 'Portugal', visitante: 'Gana', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-26T18:00:00Z')) },
-                { mandante: 'Bolívia', visitante: 'Sérvia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-26T18:00:00Z')) },
-                { mandante: 'Sérvia', visitante: 'Gana', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-01T18:00:00Z')) },
-                { mandante: 'Bolívia', visitante: 'Portugal', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-01T18:00:00Z')) },
-                // Fase de Grupos - Grupo C
-                { mandante: 'Colômbia', visitante: 'Itália', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-21T15:00:00Z')) },
-                { mandante: 'Brasil', visitante: 'Costa Rica', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-21T21:00:00Z')) },
-                { mandante: 'Brasil', visitante: 'Colômbia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-26T21:00:00Z')) },
-                { mandante: 'Costa Rica', visitante: 'Itália', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-27T18:00:00Z')) },
-                { mandante: 'Itália', visitante: 'Brasil', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-01T21:00:00Z')) },
-                { mandante: 'Costa Rica', visitante: 'Colômbia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-01T21:00:00Z')) },
-                // Fase de Grupos - Grupo D
-                { mandante: 'Espanha', visitante: 'Bélgica', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-22T12:00:00Z')) },
-                { mandante: 'Áustria', visitante: 'Azerbaijão', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-22T18:00:00Z')) },
-                { mandante: 'Espanha', visitante: 'Áustria', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-27T12:00:00Z')) },
-                { mandante: 'Azerbaijão', visitante: 'Bélgica', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-27T21:00:00Z')) },
-                { mandante: 'Bélgica', visitante: 'Áustria', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-02T18:00:00Z')) },
-                { mandante: 'Azerbaijão', visitante: 'Espanha', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-02T18:00:00Z')) },
-                // Fase de Grupos - Grupo E
-                { mandante: 'França', visitante: 'Holanda', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-22T15:00:00Z')) },
-                { mandante: 'Senegal', visitante: 'Nova Zelândia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-22T21:00:00Z')) },
-                { mandante: 'França', visitante: 'Senegal', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-27T15:00:00Z')) },
-                { mandante: 'Nova Zelândia', visitante: 'Holanda', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-27T18:00:00Z')) },
-                { mandante: 'Holanda', visitante: 'Senegal', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-02T18:00:00Z')) },
-                { mandante: 'Nova Zelândia', visitante: 'França', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-02T21:00:00Z')) },
-                // Fase de Grupos - Grupo F
-                { mandante: 'Inglaterra', visitante: 'Irã', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-20T21:00:00Z')) },
-                { mandante: 'Estados Unidos', visitante: 'País de Gales', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-21T20:00:00Z')) },
-                { mandante: 'Inglaterra', visitante: 'Estados Unidos', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-25T21:00:00Z')) },
-                { mandante: 'País de Gales', visitante: 'Irã', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-25T16:00:00Z')) },
-                { mandante: 'Irã', visitante: 'Estados Unidos', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-29T20:00:00Z')) },
-                { mandante: 'País de Gales', visitante: 'Inglaterra', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-29T20:00:00Z')) },
-                // Fase de Grupos - Grupo G
-                { mandante: 'Argentina', visitante: 'Eslováquia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-23T12:00:00Z')) },
-                { mandante: 'Canadá', visitante: 'Peru', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-23T15:00:00Z')) },
-                { mandante: 'Argentina', visitante: 'Canadá', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-28T18:00:00Z')) },
-                { mandante: 'Peru', visitante: 'Eslováquia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-28T21:00:00Z')) },
-                { mandante: 'Eslováquia', visitante: 'Canadá', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-03T18:00:00Z')) },
-                { mandante: 'Peru', visitante: 'Argentina', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-03T21:00:00Z')) },
-                // Fase de Grupos - Grupo H
-                { mandante: 'Alemanha', visitante: 'Islândia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-23T18:00:00Z')) },
-                { mandante: 'Japão', visitante: 'Costa do Marfim', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-23T21:00:00Z')) },
-                { mandante: 'Alemanha', visitante: 'Japão', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-28T12:00:00Z')) },
-                { mandante: 'Costa do Marfim', visitante: 'Islândia', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-06-28T15:00:00Z')) },
-                { mandante: 'Islândia', visitante: 'Costa do Marfim', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-03T15:00:00Z')) },
-                { mandante: 'Japão', visitante: 'Alemanha', fase: 'Grupos', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-03T15:00:00Z')) },
-                // Oitavas de Final
-                { mandante: '1º G', visitante: '2º H', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-04T16:00:00Z')) },
-                { mandante: '1º H', visitante: '2º G', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-04T20:00:00Z')) },
-                { mandante: '1º F', visitante: '2º E', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-05T16:00:00Z')) },
-                { mandante: '1º E', visitante: '2º F', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-05T20:00:00Z')) },
-                { mandante: '1º D', visitante: '2º C', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-06T16:00:00Z')) },
-                { mandante: '1º C', visitante: '2º D', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-06T20:00:00Z')) },
-                { mandante: '1º B', visitante: '2º A', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-07T16:00:00Z')) },
-                { mandante: '1º A', visitante: '2º B', fase: 'Oitavas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-07T20:00:00Z')) },
-                // Quartas de Final
-                { mandante: 'Vencedor OF 1', visitante: 'Vencedor OF 2', fase: 'Quartas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-09T16:00:00Z')) },
-                { mandante: 'Vencedor OF 3', visitante: 'Vencedor OF 4', fase: 'Quartas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-09T20:00:00Z')) },
-                { mandante: 'Vencedor OF 5', visitante: 'Vencedor OF 6', fase: 'Quartas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-10T16:00:00Z')) },
-                { mandante: 'Vencedor OF 7', visitante: 'Vencedor OF 8', fase: 'Quartas', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-10T20:00:00Z')) },
-                // Semifinais
-                { mandante: 'Vencedor QF 1', visitante: 'Vencedor QF 2', fase: 'Semis', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-13T20:00:00Z')) },
-                { mandante: 'Vencedor QF 3', visitante: 'Vencedor QF 4', fase: 'Semis', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-14T20:00:00Z')) },
-                // Final
-                { mandante: 'Vencedor SF 1', visitante: 'Vencedor SF 2', fase: 'Final', dataHora: firebase.firestore.Timestamp.fromDate(new Date('2026-07-19T16:00:00Z')) }
-            ];
-
-            try {
-                const batch = db.batch();
-                jogos.forEach((jogo, idx) => {
-                    const ref = db.collection('jogos').doc(`jogo_${idx}`);
-                    batch.set(ref, {
-                        ...jogo,
-                        golsMandante: null,
-                        golsVisitante: null,
-                        vencedorPenaltis: null,
-                        golsReaisMandante: null,
-                        golsReaisVisitante: null,
-                        resultadoProcessado: false
+                db.collection('jogos').orderBy('dataHora', 'asc').limit(20).get().then(snapshot => {
+                    container.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const jogo = doc.data();
+                        const div = document.createElement('div');
+                        div.className = 'border p-3 rounded-lg';
+                        div.innerHTML = `
+                            <p class="font-bold">${jogo.mandante} vs ${jogo.visitante}</p>
+                            <button class="btn-primario text-xs mt-2">Computar Placar</button>
+                        `;
+                        container.appendChild(div);
                     });
                 });
-                await batch.commit();
-                console.log('✅ 104 jogos criados com sucesso!');
-                alert('Seeding completado! Recarregue a página.');
-            } catch (err) {
-                console.error('❌ Erro ao fazer seeding:', err);
-                alert('Erro: ' + err.message);
-            }
+            } catch (err) { container.innerHTML = err.message; }
         }
-
-        // Chamar seedJogos() no console quando necessário
-        // window.seedJogos = seedJogos;
     </script>
-
-    <!-- ========================================
-         FIREBASE SECURITY RULES
-         Adicione estas regras no Console Firebase → Firestore → Rules
-         ========================================
-    
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /usuarios/{userId} {
-          allow read: if request.auth != null;
-          allow write: if request.auth.uid == userId;
-        }
-        match /jogos/{document=**} {
-          allow read: if request.auth != null;
-          allow write: if false;
-        }
-        match /palpites/{document=**} {
-          allow read: if request.auth != null && (request.auth.uid == resource.data.userId || request.auth.uid in get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.admin == true);
-          allow write: if request.auth != null && request.auth.uid == resource.data.userId;
-        }
-        match /admins/{userId} {
-          allow read: if request.auth.uid == userId;
-          allow write: if request.auth.uid == userId;
-        }
-      }
-    }
-    ======================================== -->
 </body>
 </html>
