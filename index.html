@@ -1,52 +1,226 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
-    // Inicialização utilizando o objeto CONFIG já existente no seu código
-    const app = initializeApp(CONFIG.FIREBASE);
-    const auth = getAuth(app);
-
-    // Mapeamento dos elementos da interface
-    const authForm = document.getElementById('auth-form');
-    const emailInput = document.getElementById('auth-email');
-    const passwordInput = document.getElementById('auth-password');
-    const errorDiv = document.getElementById('auth-error');
-    const submitButton = authForm.querySelector('button[type="submit"]');
-
-    // Interceptação do evento de submissão (Login)
-    authForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Impede o recarregamento da página
-
-        // Feedback visual de processamento
-        const originalButtonText = submitButton.innerText;
-        submitButton.innerText = "Processando...";
-        submitButton.classList.add('loading');
-        submitButton.disabled = true;
-        errorDiv.classList.add('hidden');
-
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-            
-            // Sucesso na autenticação
-            console.log("Login efetuado com sucesso:", userCredential.user.email);
-            
-            // Aqui você deve inserir a lógica para esconder a tela de login e mostrar o conteúdo do app
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-content').classList.remove('hidden');
-            document.getElementById('user-info').innerText = userCredential.user.email;
-            document.getElementById('logout-btn').classList.remove('hidden');
-            document.getElementById('login-btn').classList.add('hidden');
-
-        } catch (error) {
-            // Tratamento de falhas (credenciais inválidas, rede, etc.)
-            console.error("Erro na autenticação:", error.code);
-            errorDiv.innerText = "Falha ao acessar: Verifique seu e-mail e senha.";
-            errorDiv.classList.remove('hidden');
-        } finally {
-            // Restauração do estado do botão
-            submitButton.innerText = originalButtonText;
-            submitButton.classList.remove('loading');
-            submitButton.disabled = false;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolão Copa do Mundo 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
+    <style>
+        :root {
+            --verde: #009c3b;
+            --amarelo: #ffdf00;
+            --azul: #002776;
         }
-    });
-</script>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .estado-salvo { background-color: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .estado-nao-salvo { background-color: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .estado-pendente { background-color: #fee2e2; color: #991b1b; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .estado-processado { background-color: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .card-jogo { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: box-shadow 0.2s; }
+        .card-jogo:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-primario { background-color: #002776; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; }
+        .btn-primario:hover { background-color: #001a50; }
+        .btn-sucesso { background-color: #009c3b; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; }
+        .btn-sucesso:hover { background-color: #007a2e; }
+        .loading { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <script>
+        window.CONFIG = {
+            FIREBASE: {
+                apiKey: "AIzaSyAXItDoa0tFDrLyJFHv5XYFaF6wdZk-KbM",
+                authDomain: "bolaocopa2026-9f2c5.firebaseapp.com",
+                projectId: "bolaocopa2026-9f2c5",
+                storageBucket: "bolaocopa2026-9f2c5.firebasestorage.app",
+                messagingSenderId: "1013975984344",
+                appId: "1:1013975984344:web:cf16bdfd401c3c2c390fad"
+            },
+            EMAILJS: {
+                serviceId: "service_XXXXXXXX", 
+                templateId: "template_XXXXXXXX", 
+                userId: "YOUR_EMAILJS_PUBLIC_KEY" 
+            },
+            TIMEZONE: "America/Sao_Paulo"
+        };
+
+        // Inicialização dos Plugins de Fusos Horários
+        dayjs.extend(window.dayjs_plugin_utc);
+        dayjs.extend(window.dayjs_plugin_timezone);
+        dayjs.tz.setDefault(window.CONFIG.TIMEZONE);
+    </script>
+
+    <div id="app" class="min-h-screen bg-gray-50">
+        <nav class="sticky top-0 z-50 bg-white shadow border-b border-yellow-400">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-blue-800">⚽ Bolão Brasil 2026</h1>
+                <div id="user-info" class="text-sm font-medium text-gray-700"></div>
+                <button id="logout-btn" class="btn-primario hidden">Sair</button>
+                <button id="login-btn" class="btn-primario">Entrar</button>
+            </div>
+        </nav>
+
+        <div class="max-w-6xl mx-auto px-4 py-6">
+            
+            <div id="auth-screen" class="auth-screen">
+                <div class="max-w-md mx-auto mt-16 bg-white p-8 rounded-lg shadow-lg border-t-4 border-green-600">
+                    <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center text-gray-800">Acessar Bolão</h2>
+                    <form id="auth-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">E-mail</label>
+                            <input id="auth-email" type="email" required placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">Senha</label>
+                            <input id="auth-password" type="password" required placeholder="••••••••" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <button type="submit" class="btn-sucesso w-full py-2.5">Entrar</button>
+                    </form>
+                    <p id="auth-toggle" class="text-center text-sm text-gray-600 mt-4 cursor-pointer">
+                        Não tem uma conta? <span class="text-blue-700 font-semibold">Registre-se</span>
+                    </p>
+                    <div id="auth-error" class="mt-4 p-3 bg-red-100 text-red-800 rounded-lg hidden text-sm"></div>
+                </div>
+            </div>
+
+            <div id="app-content" class="hidden">
+                <div class="flex gap-2 mb-6 border-b border-gray-300 overflow-x-auto">
+                    <button data-tab="jogos" class="tab-btn px-4 py-2 border-b-2 border-blue-700 text-blue-700 font-semibold whitespace-nowrap">🎯 Partidas</button>
+                    <button data-tab="longo-prazo" class="tab-btn px-4 py-2 text-gray-606 hover:text-gray-800 whitespace-nowrap">🏅 Palpites Especiais</button>
+                    <button data-tab="ranking" class="tab-btn px-4 py-2 text-gray-606 hover:text-gray-800 whitespace-nowrap">🏆 Classificação Geral</button>
+                    <button data-tab="admin" class="tab-btn px-4 py-2 text-gray-606 hover:text-gray-800 hidden whitespace-nowrap">⚙️ Painel Admin</button>
+                </div>
+
+                <div id="jogos" class="tab-content active">
+                    <div class="mb-4 flex gap-2 flex-wrap items-center justify-between">
+                        <select id="fase-filter" class="border border-gray-300 rounded-lg px-3 py-2 bg-white text-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todas as Fases</option>
+                            <option value="Grupos">Fase de Grupos</option>
+                            <option value="32avos">Fase de 32-avos</option>
+                            <option value="16avos">Fase de 16-avos</option>
+                        </select>
+                    </div>
+                    <div class="text-gray-500 text-sm italic">Nenhuma partida carregada estruturalmente.</div>
+                </div>
+
+                <div id="longo-prazo" class="tab-content">
+                    <div class="p-4 bg-white rounded-lg border border-gray-200">
+                        <p class="text-gray-700 font-medium">Palpites de Longo Prazo</p>
+                    </div>
+                </div>
+
+                <div id="ranking" class="tab-content">
+                    <div class="p-4 bg-white rounded-lg border border-gray-200">
+                        <p class="text-gray-700 font-medium">Classificação dos Usuários</p>
+                    </div>
+                </div>
+
+                <div id="admin" class="tab-content">
+                    <div class="p-4 bg-white rounded-lg border border-gray-200">
+                        <p class="text-gray-700 font-medium">Painel de Controle do Administrador</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const app = initializeApp(window.CONFIG.FIREBASE);
+        const auth = getAuth(app);
+
+        // Mapeamento de Elementos do DOM
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('auth-email');
+        const passwordInput = document.getElementById('auth-password');
+        const errorDiv = document.getElementById('auth-error');
+        const submitButton = authForm.querySelector('button[type="submit"]');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginBtn = document.getElementById('login-btn');
+
+        // Lógica de Alternância de Abas (Tab Navigation)
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.getAttribute('data-tab');
+                
+                // Reset de classes dos botões
+                tabBtns.forEach(b => {
+                    b.classList.remove('border-b-2', 'border-blue-700', 'text-blue-700', 'font-semibold');
+                    b.classList.add('text-gray-600');
+                });
+                
+                // Ativação do botão clicado
+                btn.classList.add('border-b-2', 'border-blue-700', 'text-blue-700', 'font-semibold');
+                btn.classList.remove('text-gray-600');
+
+                // Alternância do conteúdo visível
+                tabContents.forEach(content => {
+                    if (content.id === targetTab) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // Escuta de Evento do Formulário de Login
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const originalButtonText = submitButton.innerText;
+            submitButton.innerText = "Processando...";
+            submitButton.classList.add('loading');
+            submitButton.disabled = true;
+            errorDiv.classList.add('hidden');
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                
+                // Transição de Interface Pós-Autenticação
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+                document.getElementById('user-info').innerText = userCredential.user.email;
+                logoutBtn.classList.remove('hidden');
+                loginBtn.classList.add('hidden');
+
+            } catch (error) {
+                console.error("Erro na autenticação:", error.code);
+                errorDiv.innerText = "Falha ao acessar: Verifique seu e-mail e senha.";
+                errorDiv.classList.remove('hidden');
+            } finally {
+                submitButton.innerText = originalButtonText;
+                submitButton.classList.remove('loading');
+                submitButton.disabled = false;
+            }
+        });
+
+        // Evento de Logout
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-content').classList.add('hidden');
+                document.getElementById('user-info').innerText = "";
+                logoutBtn.classList.add('hidden');
+                loginBtn.classList.remove('hidden');
+                authForm.reset();
+            } catch (error) {
+                console.error("Erro ao sair:", error);
+            }
+        });
+    </script>
+</body>
+</html>
