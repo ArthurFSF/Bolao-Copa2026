@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolão Copa do Mundo 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase-sdk/10.7.2/firebase-app.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase-sdk/10.7.2/firebase-auth.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase-sdk/10.7.2/firebase-firestore.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/utc.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/timezone.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
             --verde: #092c5e;
@@ -46,8 +39,8 @@
                 authDomain: "copa-2026-bolao.firebaseapp.com",
                 projectId: "copa-2026-bolao",
                 storageBucket: "copa-2026-bolao.appspot.com",
-                messagingSenderId: "123456789012",
-                appId: "1:123456789012:web:abcdef1234567890"
+                messagingSenderId: "123456789000",
+                appId: "1:123456789000:web:abcdef1234567890"
             },
             EMAILJS: {
                 serviceId: "service_XXXXXXXX",
@@ -172,12 +165,24 @@
         </div>
     </div>
 
+    <!-- ======================================== FIREBASE & EMAILJS ======================================== -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
     <!-- ======================================== JAVASCRIPT ======================================== -->
     <script>
-        // Inicializar dayjs
-        dayjs.extend(dayjs.utc);
-        dayjs.extend(dayjs.timezone);
-        const TZ = CONFIG.TIMEZONE;
+        // Funções auxiliares de data (sem dependência de dayjs complexo)
+        function formatarData(timestamp) {
+            if (!timestamp) return '-';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const dia = String(date.getDate()).padStart(2, '0');
+            const mes = String(date.getMonth() + 1).padStart(2, '0');
+            const hora = String(date.getHours()).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes} ${hora}:${min}`;
+        }
 
         // ========== FIREBASE ==========
         const firebaseApp = firebase.initializeApp(CONFIG.FIREBASE);
@@ -188,14 +193,13 @@
         async function initFirestore() {
             try {
                 await db.enableIndexedDbPersistence();
-                console.log("Persistência offline ativada");
+                console.log("✅ Persistência offline ativada");
             } catch (err) {
                 if (err.code === 'failed-precondition') {
-                    console.log("Modo online (múltiplas abas detectadas)");
+                    console.log("📌 Modo online (múltiplas abas detectadas)");
                 } else if (err.code === 'unimplemented') {
-                    console.log("Navegador sem suporte a IndexedDB");
+                    console.log("📌 Navegador sem suporte a IndexedDB");
                 }
-                // Fallback silencioso para modo online
             }
         }
         initFirestore();
@@ -219,12 +223,6 @@
         const RANKING_POR_PAGINA = 20;
 
         // ========== FUNÇÕES UTILITÁRIAS ==========
-        function formatarData(timestamp) {
-            if (!timestamp) return '-';
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return dayjs(date).tz(TZ).format('DD/MM HH:mm');
-        }
-
         function estaTravaAtivaParaJogo(jogo) {
             if (!jogo.dataHora) return false;
             const jogoDate = jogo.dataHora.toDate ? jogo.dataHora.toDate() : new Date(jogo.dataHora);
@@ -264,6 +262,13 @@
             try {
                 if (isSignUp) {
                     await auth.createUserWithEmailAndPassword(email, password);
+                    // Criar documento do usuário
+                    await db.collection('usuarios').doc(auth.currentUser.uid).set({
+                        email: email,
+                        pontos: 0,
+                        acertos: 0,
+                        dataCriacao: firebase.firestore.Timestamp.now()
+                    });
                 } else {
                     await auth.signInWithEmailAndPassword(email, password);
                 }
@@ -382,19 +387,7 @@
 
                 query = query.limit(ITEMS_POR_PAGINA + 1);
 
-                if (state.jogosPage > 0) {
-                    const offset = state.jogosPage * ITEMS_POR_PAGINA;
-                    const snapshot = await db.collection('jogos')
-                        .orderBy('dataHora', 'asc')
-                        .limit(offset)
-                        .get();
-                    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-                    if (lastVisible) {
-                        query = query.startAfter(lastVisible);
-                    }
-                }
-
-                const unsubscribe = query.onSnapshot((snapshot) => {
+                const unsubscribe = query.onSnapshot(async (snapshot) => {
                     container.innerHTML = '';
                     const jogos = snapshot.docs.map(doc => ({
                         id: doc.id,
@@ -407,10 +400,21 @@
                         return;
                     }
 
-                    jogos.forEach(jogo => {
+                    for (const jogo of jogos) {
+                        const palpiteDoc = await db.collection('palpites')
+                            .doc(`${state.currentUser.uid}_${jogo.id}`).get();
+                        
+                        jogo.palpiteSalvo = palpiteDoc.exists;
+                        if (palpiteDoc.exists) {
+                            const palpite = palpiteDoc.data();
+                            jogo.golsMandante = palpite.golsMandante;
+                            jogo.golsVisitante = palpite.golsVisitante;
+                            jogo.vencedorPenaltis = palpite.vencedorPenaltis;
+                        }
+
                         const card = criarCardJogo(jogo);
                         container.appendChild(card);
-                    });
+                    }
 
                     btnCarregarMais.classList.toggle('hidden', snapshot.docs.length <= ITEMS_POR_PAGINA);
                 });
@@ -453,16 +457,16 @@
                     </div>
                 </div>
 
-                ${jogo.fase === 'Oitavas' || jogo.fase === 'Quartas' || jogo.fase === 'Semis' || jogo.fase === 'Final' ? `
+                ${jogo.fase !== 'Grupos' ? `
                     <div class="mb-4">
                         <label class="block text-xs text-gray-600 mb-2">Se ir a pênaltis:</label>
                         <select data-jogo-id="${jogo.id}" data-field="vencedorPenaltis" class="w-full border border-gray-300 rounded px-2 py-1" ${trava ? 'disabled' : ''}>
                             <option value="">Nenhum</option>
-                            <option value="${jogo.mandante || 'Mandante'}" ${jogo.vencedorPenaltis === jogo.mandante ? 'selected' : ''}>
-                                ${jogo.mandante || 'Mandante'} (pênaltis)
+                            <option value="${jogo.mandante}" ${jogo.vencedorPenaltis === jogo.mandante ? 'selected' : ''}>
+                                ${jogo.mandante} (pênaltis)
                             </option>
-                            <option value="${jogo.visitante || 'Visitante'}" ${jogo.vencedorPenaltis === jogo.visitante ? 'selected' : ''}>
-                                ${jogo.visitante || 'Visitante'} (pênaltis)
+                            <option value="${jogo.visitante}" ${jogo.vencedorPenaltis === jogo.visitante ? 'selected' : ''}>
+                                ${jogo.visitante} (pênaltis)
                             </option>
                         </select>
                     </div>
@@ -480,11 +484,12 @@
                 await salvarPalpite(jogo.id);
             });
 
-            div.querySelectorAll('.palpite-input').forEach(input => {
+            div.querySelectorAll('.palpite-input, [data-field="vencedorPenaltis"]').forEach(input => {
                 input.addEventListener('change', () => {
                     // Marcar como não salvo
-                    div.querySelector('[class*="estado-"]').className = 'estado-nao-salvo';
-                    div.querySelector('[class*="estado-"]').textContent = '⚠ Não Salvo';
+                    const estadoSpan = div.querySelector('[class*="estado-"]');
+                    estadoSpan.className = 'estado-nao-salvo';
+                    estadoSpan.textContent = '⚠ Não Salvo';
                 });
             });
 
@@ -497,7 +502,8 @@
             const card = document.querySelector(`[data-jogo-id="${jogoId}"]`).closest('.card-jogo');
             const golsMandante = parseInt(card.querySelector('[data-field="golsMandante"]').value) || 0;
             const golsVisitante = parseInt(card.querySelector('[data-field="golsVisitante"]').value) || 0;
-            const vencedorPenaltis = card.querySelector('[data-field="vencedorPenaltis"]')?.value || '';
+            const vencedorPenaltisSelect = card.querySelector('[data-field="vencedorPenaltis"]');
+            const vencedorPenaltis = vencedorPenaltisSelect ? vencedorPenaltisSelect.value : '';
 
             try {
                 await db.collection('palpites').doc(`${state.currentUser.uid}_${jogoId}`).set({
@@ -509,9 +515,9 @@
                     dataSalva: firebase.firestore.Timestamp.now()
                 }, { merge: true });
 
-                // Atualizar UI
-                card.querySelector('[class*="estado-"]').className = 'estado-salvo';
-                card.querySelector('[class*="estado-"]').textContent = '✓ Palpite Salvo';
+                const estadoSpan = card.querySelector('[class*="estado-"]');
+                estadoSpan.className = 'estado-salvo';
+                estadoSpan.textContent = '✓ Palpite Salvo';
             } catch (err) {
                 alert('Erro ao salvar: ' + err.message);
             }
@@ -534,25 +540,12 @@
             try {
                 let query = db.collection('usuarios')
                     .orderBy('pontos', 'desc')
-                    .orderBy('acertos', 'desc')
                     .limit(RANKING_POR_PAGINA + 1);
-
-                if (state.rankingPage > 0) {
-                    const offset = state.rankingPage * RANKING_POR_PAGINA;
-                    const snapshot = await db.collection('usuarios')
-                        .orderBy('pontos', 'desc')
-                        .limit(offset)
-                        .get();
-                    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-                    if (lastVisible) {
-                        query = query.startAfter(lastVisible);
-                    }
-                }
 
                 const unsubscribe = query.onSnapshot((snapshot) => {
                     tbody.innerHTML = '';
                     const usuarios = snapshot.docs.slice(0, RANKING_POR_PAGINA).map((doc, idx) => ({
-                        posicao: state.rankingPage * RANKING_POR_PAGINA + idx + 1,
+                        posicao: idx + 1,
                         ...doc.data()
                     }));
 
@@ -560,7 +553,7 @@
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td class="px-4 py-3 font-bold text-lg">#${usuario.posicao}</td>
-                            <td class="px-4 py-3">${usuario.nome || usuario.email || 'Anônimo'}</td>
+                            <td class="px-4 py-3">${usuario.email}</td>
                             <td class="px-4 py-3 text-center font-bold text-blue-600">${usuario.pontos || 0}</td>
                             <td class="px-4 py-3 text-center">${usuario.acertos || 0}</td>
                         `;
@@ -686,7 +679,7 @@
                     await db.collection('usuarios').doc(palpite.userId).set({
                         pontos: (userData.pontos || 0) + pontos,
                         acertos: (userData.acertos || 0) + acertos,
-                        email: palpite.userId
+                        email: userData.email || palpite.userId
                     }, { merge: true });
                 });
 
@@ -755,9 +748,6 @@
         });
 
         // ========== SEEDING (Executar uma vez para popular 104 jogos) ==========
-        // Descomente a linha abaixo e abra o console para executar o seeding
-        // seedJogos();
-
         async function seedJogos() {
             const jogos = [
                 // Fase de Grupos - Grupo A
@@ -852,22 +842,23 @@
                     });
                 });
                 await batch.commit();
-                console.log('104 jogos criados com sucesso!');
+                console.log('✅ 104 jogos criados com sucesso!');
+                alert('Seeding completado! Recarregue a página.');
             } catch (err) {
-                console.error('Erro ao fazer seeding:', err);
+                console.error('❌ Erro ao fazer seeding:', err);
+                alert('Erro: ' + err.message);
             }
         }
 
-        // Carregar dados iniciais
-        if (state.currentUser) {
-            carregarJogos();
-            carregarRanking();
-        }
+        // Chamar seedJogos() no console quando necessário
+        // window.seedJogos = seedJogos;
     </script>
 
     <!-- ========================================
-         FIREBASE SECURITY RULES (Adicione estas regras no Console Firebase)
+         FIREBASE SECURITY RULES
+         Adicione estas regras no Console Firebase → Firestore → Rules
          ========================================
+    
     rules_version = '2';
     service cloud.firestore {
       match /databases/{database}/documents {
@@ -877,7 +868,7 @@
         }
         match /jogos/{document=**} {
           allow read: if request.auth != null;
-          allow write: if request.auth.uid in get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.admin == true;
+          allow write: if false;
         }
         match /palpites/{document=**} {
           allow read: if request.auth != null && (request.auth.uid == resource.data.userId || request.auth.uid in get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.admin == true);
