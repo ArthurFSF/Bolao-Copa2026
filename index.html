@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolão Copa do Mundo 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
     <style>
         :root {
-            --verde: #092c5e;
-            --amarelo: #ffd700;
-            --azul: #0066cc;
-            --cinza-claro: #f5f5f5;
-            --cinza-escuro: #333333;
+            --verde: #009c3b;
+            --amarelo: #ffdf00;
+            --azul: #002776;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         .tab-content { display: none; }
@@ -22,10 +23,10 @@
         .estado-processado { background-color: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
         .card-jogo { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: box-shadow 0.2s; }
         .card-jogo:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .btn-primario { background-color: #2563eb; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; }
-        .btn-primario:hover { background-color: #1d4ed8; }
-        .btn-secundario { background-color: #e5e7eb; color: #374151; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: background-color 0.2s; }
-        .btn-secundario:hover { background-color: #d1d5db; }
+        .btn-primario { background-color: #002776; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; }
+        .btn-primario:hover { background-color: #001a50; }
+        .btn-sucesso { background-color: #009c3b; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; }
+        .btn-sucesso:hover { background-color: #007a2e; }
         .loading { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
@@ -48,13 +49,18 @@
             },
             TIMEZONE: "America/Sao_Paulo"
         };
+
+        // Inicialização dos Plugins de Fusos Horários
+        dayjs.extend(window.dayjs_plugin_utc);
+        dayjs.extend(window.dayjs_plugin_timezone);
+        dayjs.tz.setDefault(CONFIG.TIMEZONE);
     </script>
 
     <div id="app" class="min-h-screen bg-gray-50">
-        <nav class="sticky top-0 z-50 bg-white shadow">
+        <nav class="sticky top-0 z-50 bg-white shadow border-b border-yellow-400">
             <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-blue-600">⚽ Bolão Copa 2026</h1>
-                <div id="user-info" class="text-sm text-gray-600"></div>
+                <h1 class="text-2xl font-bold text-blue-800">⚽ Bolão Brasil 2026</h1>
+                <div id="user-info" class="text-sm font-medium text-gray-700"></div>
                 <button id="logout-btn" class="btn-primario hidden">Sair</button>
                 <button id="login-btn" class="btn-primario">Entrar</button>
             </div>
@@ -62,468 +68,38 @@
 
         <div class="max-w-6xl mx-auto px-4 py-6">
             <div id="auth-screen" class="auth-screen">
-                <div class="max-w-md mx-auto mt-20 bg-white p-8 rounded-lg shadow-lg">
-                    <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center">Login</h2>
+                <div class="max-w-md mx-auto mt-16 bg-white p-8 rounded-lg shadow-lg border-t-4 border-green-600">
+                    <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center text-gray-800">Acessar Bolão</h2>
                     <form id="auth-form" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium mb-1">E-mail</label>
-                            <input id="auth-email" type="email" required placeholder="seu@email.com" 
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-sm font-medium mb-1 text-gray-700">E-mail</label>
+                            <input id="auth-email" type="email" required placeholder="seu@email.com" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-1">Senha</label>
-                            <input id="auth-password" type="password" required placeholder="••••••••" 
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-sm font-medium mb-1 text-gray-700">Senha</label>
+                            <input id="auth-password" type="password" required placeholder="••••••••" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
-                        <button type="submit" class="btn-primario w-full">Entrar</button>
+                        <button type="submit" class="btn-sucesso w-full py-2.5">Entrar</button>
                     </form>
                     <p id="auth-toggle" class="text-center text-sm text-gray-600 mt-4 cursor-pointer">
-                        Não tem conta? <span class="text-blue-600 font-semibold">Registre-se</span>
+                        Não tem uma conta? <span class="text-blue-700 font-semibold">Registre-se</span>
                     </p>
-                    <div id="auth-error" class="mt-4 p-3 bg-red-100 text-red-800 rounded-lg hidden"></div>
+                    <div id="auth-error" class="mt-4 p-3 bg-red-100 text-red-800 rounded-lg hidden text-sm"></div>
                 </div>
             </div>
 
             <div id="app-content" class="hidden">
-                <div class="flex gap-2 mb-6 border-b border-gray-300">
-                    <button data-tab="jogos" class="tab-btn px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-semibold">
-                        🎯 Jogos
-                    </button>
-                    <button data-tab="ranking" class="tab-btn px-4 py-2 text-gray-600 hover:text-gray-800">
-                        🏆 Ranking
-                    </button>
-                    <button data-tab="admin" class="tab-btn px-4 py-2 text-gray-600 hover:text-gray-800 hidden">
-                        ⚙️ Admin
-                    </button>
+                <div class="flex gap-2 mb-6 border-b border-gray-300 overflow-x-auto">
+                    <button data-tab="jogos" class="tab-btn px-4 py-2 border-b-2 border-blue-700 text-blue-700 font-semibold whitespace-nowrap">🎯 Partidas</button>
+                    <button data-tab="longo-prazo" class="tab-btn px-4 py-2 text-gray-600 hover:text-gray-800 whitespace-nowrap">🏅 Palpites Especiais</button>
+                    <button data-tab="ranking" class="tab-btn px-4 py-2 text-gray-600 hover:text-gray-800 whitespace-nowrap">🏆 Classificação Geral</button>
+                    <button data-tab="admin" class="tab-btn px-4 py-2 text-gray-600 hover:text-gray-800 hidden whitespace-nowrap">⚙️ Painel Admin</button>
                 </div>
 
                 <div id="jogos" class="tab-content active">
-                    <div class="mb-4 flex gap-2 flex-wrap">
-                        <select id="fase-filter" class="border border-gray-300 rounded-lg px-3 py-2">
+                    <div class="mb-4 flex gap-2 flex-wrap items-center justify-between">
+                        <select id="fase-filter" class="border border-gray-300 rounded-lg px-3 py-2 bg-white text-sm focus:ring-2 focus:ring-blue-500">
                             <option value="">Todas as Fases</option>
                             <option value="Grupos">Fase de Grupos</option>
-                            <option value="Oitavas">Oitavas de Final</option>
-                            <option value="Quartas">Quartas de Final</option>
-                            <option value="Semis">Semifinais</option>
-                            <option value="Final">Final</option>
-                        </select>
-                    </div>
-                    <div id="jogos-container" class="space-y-4"></div>
-                    <button id="carregar-mais-jogos" class="btn-primario w-full mt-6 hidden">Carregar Mais Jogos</button>
-                </div>
-
-                <div id="ranking" class="tab-content">
-                    <div class="bg-white rounded-lg shadow">
-                        <table class="w-full">
-                            <thead class="bg-blue-600 text-white">
-                                <tr>
-                                    <th class="px-4 py-3 text-left">Posição</th>
-                                    <th class="px-4 py-3 text-left">Participante</th>
-                                    <th class="px-4 py-3 text-center">Pontos</th>
-                                    <th class="px-4 py-3 text-center">Acertos</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ranking-tbody" class="divide-y">
-                                <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Carregando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <button id="carregar-mais-ranking" class="btn-primario w-full mt-6 hidden">Carregar Mais</button>
-                </div>
-
-                <div id="admin" class="tab-content">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-lg font-bold mb-4">Processar Resultados</h3>
-                            <div id="admin-jogos-container" class="space-y-3"></div>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-lg font-bold mb-4">Enviar E-mails</h3>
-                            <div class="space-y-3">
-                                <textarea id="email-message" placeholder="Mensagem personalizada..." 
-                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 h-32"></textarea>
-                                <button id="send-emails-btn" class="btn-primario w-full">Enviar E-mails em Lote</button>
-                                <div id="email-status" class="text-sm text-gray-600"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
-    <script>
-        function formatarData(timestamp) {
-            if (!timestamp) return '-';
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            const dia = String(date.getDate()).padStart(2, '0');
-            const mes = String(date.getMonth() + 1).padStart(2, '0');
-            const hora = String(date.getHours()).padStart(2, '0');
-            const min = String(date.getMinutes()).padStart(2, '0');
-            return `${dia}/${mes} ${hora}:${min}`;
-        }
-
-        // Inicialização Segura do Firebase
-        const firebaseApp = firebase.initializeApp(CONFIG.FIREBASE);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        async function initFirestore() {
-            try {
-                await db.enablePersistence();
-                console.log("✅ Persistência offline ativada");
-            } catch (err) {
-                if (err.code === 'failed-precondition') {
-                    console.log("📌 Modo online (múltiplas abas detectadas)");
-                } else if (err.code === 'unimplemented') {
-                    console.log("📌 Navegador sem suporte a IndexedDB");
-                }
-            }
-        }
-        initFirestore();
-
-        // Inicialização Isolada do EmailJS contra quebras de escopo
-        if (typeof emailjs !== 'undefined') {
-            emailjs.init(CONFIG.EMAILJS.userId);
-        } else {
-            console.error("⚠️ SDK do EmailJS indisponível ou bloqueado por AdBlock.");
-        }
-
-        const state = {
-            currentUser: null,
-            currentTab: 'jogos',
-            jogosPage: 0,
-            rankingPage: 0,
-            listeners: [],
-            faseFilter: ''
-        };
-
-        const ITEMS_POR_PAGINA = 12;
-        const RANKING_POR_PAGINA = 20;
-
-        function estaTravaAtivaParaJogo(jogo) {
-            if (!jogo.dataHora) return false;
-            const jogoDate = jogo.dataHora.toDate ? jogo.dataHora.toDate() : new Date(jogo.dataHora);
-            const agora = new Date();
-            const diffMinutos = (jogoDate - agora) / (1000 * 60);
-            return diffMinutos < 120;
-        }
-
-        function limparListeners() {
-            state.listeners.forEach(unsubscribe => {
-                try { unsubscribe(); } catch (e) {}
-            });
-            state.listeners = [];
-        }
-
-        const loginBtn = document.getElementById('login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const authScreen = document.getElementById('auth-screen');
-        const appContent = document.getElementById('app-content');
-        const authForm = document.getElementById('auth-form');
-        const authEmail = document.getElementById('auth-email');
-        const authPassword = document.getElementById('auth-password');
-        const authTitle = document.getElementById('auth-title');
-        const authToggle = document.getElementById('auth-toggle');
-        const authError = document.getElementById('auth-error');
-        const userInfo = document.getElementById('user-info');
-
-        let isSignUp = false;
-
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            authError.classList.add('hidden');
-            const email = authEmail.value;
-            const password = authPassword.value;
-
-            try {
-                if (isSignUp) {
-                    await auth.createUserWithEmailAndPassword(email, password);
-                    await db.collection('usuarios').doc(auth.currentUser.uid).set({
-                        email: email,
-                        pontos: 0,
-                        acertos: 0,
-                        dataCriacao: firebase.firestore.Timestamp.now()
-                    });
-                } else {
-                    await auth.signInWithEmailAndPassword(email, password);
-                }
-            } catch (err) {
-                authError.textContent = err.message;
-                authError.classList.remove('hidden');
-            }
-        });
-
-        authToggle.addEventListener('click', () => {
-            isSignUp = !isSignUp;
-            authTitle.textContent = isSignUp ? 'Registrar' : 'Login';
-            authToggle.innerHTML = isSignUp 
-                ? 'Já tem conta? <span class="text-blue-600 font-semibold">Faça login</span>'
-                : 'Não tem conta? <span class="text-blue-600 font-semibold">Registre-se</span>';
-        });
-
-        loginBtn.addEventListener('click', () => {
-            authScreen.style.display = 'block';
-            appContent.classList.add('hidden');
-        });
-
-        logoutBtn.addEventListener('click', async () => {
-            await auth.signOut();
-        });
-
-        auth.onAuthStateChanged(async (user) => {
-            state.currentUser = user;
-            if (user) {
-                authScreen.style.display = 'none';
-                appContent.classList.remove('hidden');
-                loginBtn.classList.add('hidden');
-                logoutBtn.classList.remove('hidden');
-                userInfo.textContent = `👤 ${user.email}`;
-                await carregarJogos();
-                await carregarRanking();
-                await verificarSeEhAdmin();
-            } else {
-                authScreen.style.display = 'block';
-                appContent.classList.add('hidden');
-                loginBtn.classList.remove('hidden');
-                logoutBtn.classList.add('hidden');
-                userInfo.textContent = '';
-                limparListeners();
-            }
-        });
-
-        async function verificarSeEhAdmin() {
-            try {
-                const doc = await db.collection('admins').doc(state.currentUser.uid).get();
-                const adminTab = document.querySelector('[data-tab="admin"]');
-                if (doc.exists) {
-                    adminTab.classList.remove('hidden');
-                } else {
-                    adminTab.classList.add('hidden');
-                }
-            } catch (err) {
-                console.log("Erro verificação admin:", err);
-            }
-        }
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const tabName = e.target.closest('button').dataset.tab;
-                state.currentTab = tabName;
-                
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.getElementById(tabName).classList.add('active');
-                
-                document.querySelectorAll('.tab-btn').forEach(b => {
-                    b.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600', 'font-semibold');
-                    b.classList.add('text-gray-600', 'hover:text-gray-800');
-                });
-                e.target.classList.add('border-b-2', 'border-blue-600', 'text-blue-600', 'font-semibold');
-                e.target.classList.remove('text-gray-600', 'hover:text-gray-800');
-
-                limparListeners();
-                
-                if (tabName === 'jogos') {
-                    state.jogosPage = 0;
-                    carregarJogos();
-                } else if (tabName === 'ranking') {
-                    state.rankingPage = 0;
-                    carregarRanking();
-                } else if (tabName === 'admin') {
-                    carregarAdminPainel();
-                }
-            });
-        });
-
-        document.getElementById('fase-filter').addEventListener('change', (e) => {
-            state.faseFilter = e.target.value;
-            state.jogosPage = 0;
-            carregarJogos();
-        });
-
-        async function carregarJogos() {
-            const container = document.getElementById('jogos-container');
-            const btnCarregarMais = document.getElementById('carregar-mais-jogos');
-
-            limparListeners();
-            container.innerHTML = '<p class="text-center text-gray-500">Carregando...</p>';
-
-            try {
-                let query = db.collection('jogos').orderBy('dataHora', 'asc');
-                if (state.faseFilter) {
-                    query = query.where('fase', '==', state.faseFilter);
-                }
-                query = query.limit(ITEMS_POR_PAGINA + 1);
-
-                const unsubscribe = query.onSnapshot(async (snapshot) => {
-                    container.innerHTML = '';
-                    const jogos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).slice(0, ITEMS_POR_PAGINA);
-
-                    if (jogos.length === 0) {
-                        container.innerHTML = '<p class="text-center text-gray-500">Nenhum jogo encontrado</p>';
-                        btnCarregarMais.classList.add('hidden');
-                        return;
-                    }
-
-                    for (const jogo of jogos) {
-                        const palpiteDoc = await db.collection('palpites').doc(`${state.currentUser.uid}_${jogo.id}`).get();
-                        jogo.palpiteSalvo = palpiteDoc.exists;
-                        if (palpiteDoc.exists) {
-                            const palpite = palpiteDoc.data();
-                            jogo.golsMandante = palpite.golsMandante;
-                            jogo.golsVisitante = palpite.golsVisitante;
-                            jogo.vencedorPenaltis = palpite.vencedorPenaltis;
-                        }
-                        container.appendChild(criarCardJogo(jogo));
-                    }
-                    btnCarregarMais.classList.toggle('hidden', snapshot.docs.length <= ITEMS_POR_PAGINA);
-                });
-                state.listeners.push(unsubscribe);
-            } catch (err) {
-                container.innerHTML = `<p class="text-center text-red-500">Erro: ${err.message}</p>`;
-            }
-        }
-
-        function criarCardJogo(jogo) {
-            const div = document.createElement('div');
-            div.className = 'card-jogo';
-            const trava = estaTravaAtivaParaJogo(jogo);
-            const estadoClass = jogo.palpiteSalvo ? 'estado-salvo' : 'estado-nao-salvo';
-            const estadoText = jogo.palpiteSalvo ? '✓ Palpite Salvo' : '⚠ Não Salvo';
-
-            div.innerHTML = `
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <p class="text-sm text-gray-500">${jogo.fase} • ${formatarData(jogo.dataHora)}</p>
-                        <p class="text-lg font-bold">${jogo.mandante || 'TBD'} vs ${jogo.visitante || 'TBD'}</p>
-                    </div>
-                    <span class="${estadoClass}">${estadoText}</span>
-                </div>
-                <div class="grid grid-cols-2 gap-3 mb-4">
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">Gols ${jogo.mandante || 'Mandante'}</label>
-                        <input type="number" data-jogo-id="${jogo.id}" data-field="golsMandante" min="0" 
-                            value="${jogo.golsMandante !== undefined ? jogo.golsMandante : ''}" class="palpite-input w-full border border-gray-300 rounded px-2 py-1" ${trava ? 'disabled' : ''}>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">Gols ${jogo.visitante || 'Visitante'}</label>
-                        <input type="number" data-jogo-id="${jogo.id}" data-field="golsVisitante" min="0" 
-                            value="${jogo.golsVisitante !== undefined ? jogo.golsVisitante : ''}" class="palpite-input w-full border border-gray-300 rounded px-2 py-1" ${trava ? 'disabled' : ''}>
-                    </div>
-                </div>
-                ${jogo.fase !== 'Grupos' ? `
-                    <div class="mb-4">
-                        <label class="block text-xs text-gray-600 mb-2">Se ir a pênaltis:</label>
-                        <select data-jogo-id="${jogo.id}" data-field="vencedorPenaltis" class="w-full border border-gray-300 rounded px-2 py-1" ${trava ? 'disabled' : ''}>
-                            <option value="">Nenhum</option>
-                            <option value="${jogo.mandante}" ${jogo.vencedorPenaltis === jogo.mandante ? 'selected' : ''}>${jogo.mandante}</option>
-                            <option value="${jogo.visitante}" ${jogo.vencedorPenaltis === jogo.visitante ? 'selected' : ''}>${jogo.visitante}</option>
-                        </select>
-                    </div>
-                ` : ''}
-                <button data-id="${jogo.id}" class="btn-salvar-palpite btn-primario w-full" ${trava ? 'disabled opacity-50 cursor-not-allowed' : ''}>
-                    ${trava ? '🔒 Jogo Trancado' : '💾 Salvar Palpite'}
-                </button>
-            `;
-
-            div.querySelector('.btn-salvar-palpite').addEventListener('click', async () => {
-                await salvarPalpite(jogo.id, div);
-            });
-
-            div.querySelectorAll('.palpite-input, select').forEach(input => {
-                input.addEventListener('change', () => {
-                    const span = div.querySelector('[class*="estado-"]');
-                    span.className = 'estado-nao-salvo';
-                    span.textContent = '⚠ Não Salvo';
-                });
-            });
-            return div;
-        }
-
-        async function salvarPalpite(jogoId, cardElement) {
-            if (!state.currentUser) return;
-            const golsMandante = parseInt(cardElement.querySelector('[data-field="golsMandante"]').value);
-            const golsVisitante = parseInt(cardElement.querySelector('[data-field="golsVisitante"]').value);
-            const selectPen = cardElement.querySelector('[data-field="vencedorPenaltis"]');
-            const vencedorPenaltis = selectPen ? selectPen.value : '';
-
-            if (isNaN(golsMandante) || isNaN(golsVisitante)) {
-                alert('Preencha os gols para salvar.');
-                return;
-            }
-
-            try {
-                await db.collection('palpites').doc(`${state.currentUser.uid}_${jogoId}`).set({
-                    userId: state.currentUser.uid,
-                    jogoId: jogoId,
-                    golsMandante,
-                    golsVisitante,
-                    vencedorPenaltis,
-                    dataSalva: firebase.firestore.Timestamp.now()
-                }, { merge: true });
-
-                const span = cardElement.querySelector('[class*="estado-"]');
-                span.className = 'estado-salvo';
-                span.textContent = '✓ Palpite Salvo';
-            } catch (err) {
-                alert('Erro ao salvar: ' + err.message);
-            }
-        }
-
-        async function carregarRanking() {
-            const tbody = document.getElementById('ranking-tbody');
-            const btn = document.getElementById('carregar-mais-ranking');
-            limparListeners();
-
-            try {
-                const query = db.collection('usuarios').orderBy('pontos', 'desc').limit(RANKING_POR_PAGINA);
-                const unsubscribe = query.onSnapshot((snapshot) => {
-                    tbody.innerHTML = '';
-                    snapshot.docs.forEach((doc, idx) => {
-                        const user = doc.data();
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="px-4 py-3 font-bold">#${idx + 1}</td>
-                            <td class="px-4 py-3">${user.email}</td>
-                            <td class="px-4 py-3 text-center text-blue-600 font-bold">${user.pontos || 0}</td>
-                            <td class="px-4 py-3 text-center">${user.acertos || 0}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                });
-                state.listeners.push(unsubscribe);
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="4">Erro: ${err.message}</td></tr>`;
-            }
-        }
-
-        async function carregarAdminPainel() {
-            const container = document.getElementById('admin-jogos-container');
-            container.innerHTML = 'Carregando...';
-            try {
-                db.collection('jogos').orderBy('dataHora', 'asc').limit(20).get().then(snapshot => {
-                    container.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const jogo = doc.data();
-                        const div = document.createElement('div');
-                        div.className = 'border p-3 rounded-lg';
-                        div.innerHTML = `
-                            <p class="font-bold">${jogo.mandante} vs ${jogo.visitante}</p>
-                            <button class="btn-primario text-xs mt-2">Computar Placar</button>
-                        `;
-                        container.appendChild(div);
-                    });
-                });
-            } catch (err) { container.innerHTML = err.message; }
-        }
-    </script>
-</body>
-</html>
+                            <option value="32avos">Fase de 32-avos</option>
+                            <option value="16avos">Fase
